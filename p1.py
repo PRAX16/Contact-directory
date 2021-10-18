@@ -14,8 +14,36 @@ root = Tk()
 root.geometry("417x350")
 root.title("Contacts Directory")
 
+dict_list = []
+name_tb = 0 
+phone_number_tb = 0
+address_tb = 0
+spinbox_date = 0  
+spinbox_month = 0
+spinbox_year = 0 
+temp = 0
+spinbox_cl = 0
+e_tb  = 0
+ig_tb = 0
+fb_tb = 0
+select = 0
+name_label_display = 0
+phone_display = 0 
+address_display = 0 
+dob_display = 0
+relation_display = 0
+closeness_display = 0 
+zodiac_display = 0
+country_display = 0
+email_display = 0
+insta_display = 0
+facebook_display = 0
+
+
+
+
 def showall_window2():
-    
+    global select
     showall = Toplevel()
     showall.title('Display All contacts')
 
@@ -31,25 +59,13 @@ def showall_window2():
     sort_label.grid(row=0,column=0)
     
     #Sort dropdown
-    list_of_sorting = ["Last added","Alphabetically","Closeness level","Zodiac/Star/Sun sign"]
+    list_of_sorting = ["Last added","Alphabetically","Closeness level"]
     temp3 = StringVar()
 
     #Dropdown / Option menu - sort by
     sortby_optionmenu = OptionMenu(frame1_3, temp3, *list_of_sorting)
     temp3.set("Select")
     sortby_optionmenu.grid(row=0,column=1)
-
-    # check button Flags and signs
- 
-    flag_check = IntVar()
- 
-    flag_checkbutton = Checkbutton(frame1_3, text="Display flags", onvalue=1, offvalue=0, variable=flag_check)
-    flag_checkbutton.grid(row = 1,column = 0,padx= 10, pady= 10)
- 
-    sign_check = IntVar()
- 
-    sign_checkbutton = Checkbutton(frame1_3, text="Display sign", onvalue=1, offvalue=0, variable=sign_check)
-    sign_checkbutton.grid(row = 1,column = 1,padx=10,pady=10)
 
     #frame 2
     frame2_3 = Frame(showall, bg="red",)
@@ -61,52 +77,76 @@ def showall_window2():
     scroll.config (command=select.yview)
     scroll.pack(side=RIGHT, fill=Y)
     select.pack(side=LEFT,  fill=BOTH, expand=1)
+    
 
     #frame 3 for the buttons
     frame3_3 = Frame(showall, bg = "black")
     frame3_3.pack()
 
     Button(frame3_3,text="EDIT").grid(row = 1, column = 0,padx= 10, pady=10)
-    Button(frame3_3,text="DELETE").grid(row = 1, column = 1,padx= 10, pady=10)
-    Button(frame3_3,text="VIEW").grid(row = 1, column = 2,padx= 10, pady=10)
+    Button(frame3_3,text="DELETE", command = delete).grid(row = 1, column = 1,padx= 10, pady=10)
+    Button(frame3_3,text="VIEW", command = view).grid(row = 1, column = 2,padx= 10, pady=10)
 
+def save():
+    name = name_tb.get()
+    phone = phone_number_tb.get()
+    address = address_tb.get("1.0",END)
+    dob_date = spinbox_date.get()
+    dob_month = spinbox_month.get()
+    dob_year = spinbox_year.get()
+    dob = datetime.date(int(dob_year), int(dob_month), int(dob_date))
+    relation = temp.get()
+    closeness = spinbox_cl.get()
+    gmail = e_tb.get()
+    insta = ig_tb.get()
+    facebook = fb_tb.get()
+        
+    '''
+    if name == "" or phone == "":
+        messagebox.showerror('Error','Please fill in the Name or Phone no.!')
+        return
+    '''
+
+        
+    data_dict = {'name':name,'phone':phone,'address':address,'dob':dob,'relation':relation,'closeness level':closeness,'Gmail':gmail,'Insta':insta,'Facebook':facebook}
+
+    print(data_dict) 
+
+    file = open("contact_list.txt", "a")
+    file.write(str(data_dict))
+    file.write("\n")
+    file.close()
+
+    update_list_box()
+        
+
+    messagebox.showinfo("SUCCESS", "CONTACT SAVED!")
+
+def update_list_box():
+    global dict_list, select   
+    file_display = open("contact_list.txt","r")
+    
+    select.delete(0,END)
+    dict_list.clear()
+    for i in file_display:
+        dict_list.append(eval(i.strip()))
+        print(i.strip())
+
+    # print(dict_list)
+    file_display.close()
+
+    for i in range(0,len(dict_list)):
+        name = dict_list[i].get('name')
+        select.insert(i+1,name)
 
 
 def create_window1():
+    global select, name_tb, phone_number_tb, address_tb, spinbox_date, spinbox_month, spinbox_year, temp, spinbox_cl, e_tb, ig_tb, fb_tb
     create = Toplevel()
     create.title('Create new contact')
 
     create.geometry("550x800")
     create['bg'] = "black"
-
-    def save():
-        name = name_tb.get()
-        phone = phone_number_tb.get()
-        address = address_tb.get("1.0",END)
-        dob_date = spinbox_date.get()
-        dob_month = spinbox_month.get()
-        dob_year = spinbox_year.get()
-        dob = datetime.date(int(dob_year), int(dob_month), int(dob_date))
-        relation = temp.get()
-        closeness = spinbox_cl.get()
-        gmail = e_tb.get()
-        insta = ig_tb.get()
-        facebook = fb_tb.get()
-
-        if name == "" or phone() == "":
-            messagebox.showerror('Error','Please fill in the Name or Phone no.!')
-            return
-
-        user_values = f"Name : {name}\n Phone no.: {phone}\n Address : {address}\n DOB: {dob}\n Relation: {relation} \n Closeness Level: {closeness} \n Gmail: {gmail} \n Instagram: {insta} \n Facebook: {facebook}"
- 
-        file = open("contact_list.txt", "a")
-        file.write(str(user_values))
-        file.write("\n")
-        file.write("\n")
-        file.close()
-
-        messagebox.showinfo("SUCCESS", "CONTACT SAVED!")
-
     # frame 1
     frame_1 = Frame(create)
     frame_1.pack()
@@ -289,6 +329,109 @@ def create_window1():
         link.bind("<Button-1>", lambda e: callback("http://www.instagram.com/{insta}/"))
         link.grid(row=1,column=0)   
     '''
+def delete():
+
+    deleting_option = select.curselection()
+    print(deleting_option)
+
+    text = select.get(deleting_option)
+    select.delete(deleting_option)
+    file_data = open('contact_list.txt','r')
+    lines = file_data.readlines()
+    # updated_lines = lines[:]
+    file_data.close()
+    file_data = open('contact_list.txt','w')
+    for i in lines:
+
+        dict_lol = eval(i.strip())
+        print(dict_lol)
+        if dict_lol.get('name') == text:
+            continue
+        file_data.write(i)
+
+    file_data.close()
+
+    update_list_box()
+    messagebox.showinfo("SUCCESS", "CONTACT DELETED!")
+'''
+def reset():
+
+    .set("")
+    .set("")
+    .delete("1.0","end")
+'''
+def view():
+    global name_label_display,phone_display, address_display, dob_display, relation_display, closeness_display, facebook_display, insta_display, email_display, zodiac_display, country_display, select, name_tb, phone_number_tb, address_tb, spinbox_date, spinbox_month, spinbox_year, temp, spinbox_cl, e_tb, ig_tb, fb_tb
+    vieww = Toplevel()
+    vieww.title('Contact details')
+
+    vieww.geometry("500x500")
+    vieww['bg'] = "black"
+
+
+    #reset()
+    view_option = select.curselection()
+    text = select.get(view_option)
+
+    file_data = open('contact_list.txt', 'r')
+    lines = file_data.readlines()
+
+    for i in lines:
+        dict_lol = eval(i.strip())
+
+        if dict_lol.get('name') == text:
+
+            name_label_display.set(text)
+            phone_display.set(dict_lol.get('phone'))
+            address_display.insert(END,dict_lol.get('address'))
+
+
+    # frame 1
+    frame1_4 = Frame(vieww)
+    frame1_4.pack()
+
+    #Name display label
+    name_label_display = Entry(frame1_4)
+    name_label_display.grid(row = 0, column = 0)
+    #Phone no. display
+    phone_display = Entry(frame1_4)
+    phone_display.grid(row = 1, column = 0, padx = 10, pady= 10)
+    #Adddress display
+    address_display = Text(frame1_4)
+    address_display.grid(row= 2, column= 0, padx= 10, pady= 10)
+    #DOB display
+    dob_display = Entry(frame1_4)
+    dob_display.grid(row= 3, column= 0, padx= 10, pady= 10)
+    #Relation display
+    relation_display = Entry(frame1_4)
+    relation_display.grid(row= 4, column= 0, padx= 10, pady= 10)
+    #Closeness level display
+    closeness_display = Entry(frame1_4)
+    closeness_display.grid(row= 5, column= 0, padx= 10, pady= 10)
+    #Zodiac sign display
+    zodiac_display = Entry(frame1_4)
+    zodiac_display.grid(row= 6, column= 0, padx= 10, pady= 10)
+    #Country display
+    country_display = Entry(frame1_4)
+    country_display.grid(row= 7, column= 0, padx= 10, pady= 10)
+    #Socials display
+    email_display = Entry(frame1_4)
+    email_display.grid(row= 8, column= 0, padx= 10, pady= 10)
+
+    insta_display = Entry(frame1_4)
+    insta_display.grid(row= 9, column= 0, padx= 10, pady= 10)
+
+    facebook_display = Entry(frame1_4)
+    facebook_display.grid(row= 10, column= 0, padx= 10, pady= 10)
+    #Send email
+
+
+
+
+
+
+
+    
     
 # frame 1
 frame1 = Frame(root)
